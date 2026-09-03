@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InterRapidisimo.Api/InterRapidisimo.Api.csproj" />
+    <Project Path="src/InterRapidisimo.Application/InterRapidisimo.Application.csproj" />
+    <Project Path="src/InterRapidisimo.Domain/InterRapidisimo.Domain.csproj" />
+    <Project Path="src/InterRapidisimo.Infrastructure/InterRapidisimo.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/InterRapidisimo.Tests/InterRapidisimo.Tests.csproj" />
+  </Folder>
+</Solution>

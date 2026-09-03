@@ -1,0 +1,200 @@
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Registros de Estudiantes</h1>
+      <p class="page-description">Consulta en línea las matrículas académicas y el programa de créditos de los estudiantes registrados.</p>
+    </div>
+    <button type="button" (click)="goToRegister()" class="btn btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      Registrar Estudiante
+    </button>
+  </div>
+
+  <!-- Success Notification -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Error Notification -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Search & Stats Bar -->
+  <div class="card search-bar-card">
+    <div class="search-input-wrapper">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nombre, documento o correo..."
+        [(ngModel)]="searchTerm"
+        (input)="filterStudents()"
+      />
+    </div>
+    <div class="total-badge">
+      Total registrados: <strong>{{ filteredStudents.length }}</strong>
+    </div>
+  </div>
+
+  <!-- Loading State inicial -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando registros académicos...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredStudents.length === 0" class="card empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="8"/></svg>
+    <h3>No se encontraron estudiantes</h3>
+    <p>{{ searchTerm ? 'No hay resultados que coincidan con la búsqueda.' : 'Aún no hay estudiantes registrados en el sistema.' }}</p>
+    <button type="button" (click)="goToRegister()" class="btn btn-primary btn-sm" style="margin-top: 1rem;">Registrar el Primer Estudiante</button>
+  </div>
+
+  <!-- Table Container -->
+  <div *ngIf="!loading && filteredStudents.length > 0" class="card table-card">
+    <div class="table-responsive">
+      <table class="students-table">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Estudiante</th>
+            <th>Contacto</th>
+            <th>Materias Seleccionadas (3)</th>
+            <th>Créditos</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of filteredStudents">
+            <td class="font-mono">{{ s.documentNumber }}</td>
+            <td>
+              <div class="student-name">{{ s.fullName }}</div>
+              <div class="student-date">Reg: {{ s.registrationDate | date:'dd/MM/yyyy' }}</div>
+            </td>
+            <td>
+              <div class="contact-email">{{ s.email }}</div>
+              <div class="contact-phone" *ngIf="s.phone">{{ s.phone }}</div>
+            </td>
+            <td>
+              <div class="courses-tags">
+                <span *ngFor="let c of s.courses" class="course-chip" [title]="'Docente: ' + c.teacherName">
+                  {{ c.name }}
+                  <small class="teacher-name">({{ c.teacherName }})</small>
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="badge badge-success">{{ s.totalCredits }} Créditos</span>
+            </td>
+            <td class="text-right actions-cell">
+              <!-- Requerimiento 9: Botón para ver compañeros de clase con modal de carga -->
+              <button
+                type="button"
+                (click)="goToClassmates(s)"
+                class="btn btn-sm btn-outline-primary"
+                title="Ver compañeros con quienes comparte clase"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Compañeros
+              </button>
+
+              <!-- Botón Editar con modal de carga -->
+              <button
+                type="button"
+                (click)="goToEdit(s)"
+                class="btn btn-sm btn-secondary"
+                title="Editar estudiante"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Editar
+              </button>
+
+              <!-- Botón Eliminar con Modal Corporativo -->
+              <button
+                type="button"
+                (click)="openDeleteModal(s)"
+                class="btn btn-sm btn-danger"
+                title="Eliminar registro"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL DE CONFIRMACIÓN DE ELIMINACIÓN
+     ========================================================================= -->
+<div *ngIf="deleteModalOpen && studentToDelete" class="modal-backdrop" (click)="closeDeleteModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Encabezado con icono Danger -->
+    <div class="modal-header">
+      <div class="modal-header-icon danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          <line x1="10" y1="11" x2="10" y2="17"/>
+          <line x1="14" y1="11" x2="14" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="modal-title">¿Eliminar Estudiante?</h3>
+      </div>
+    </div>
+
+    <!-- Cuerpo con resumen de datos del estudiante -->
+    <div class="modal-body">
+      <p style="color: #475569; margin-bottom: 0.25rem;">
+        Estás a punto de eliminar el registro del estudiante seleccionado:
+      </p>
+
+      <div class="student-delete-card">
+        <div class="delete-name">{{ studentToDelete.fullName }}</div>
+        <div class="delete-details">
+          <span><strong>Documento:</strong> {{ studentToDelete.documentNumber }}</span>
+          <span><strong>Email:</strong> {{ studentToDelete.email }}</span>
+          <span><strong>Materias:</strong> {{ studentToDelete.courses.length }} ({{ studentToDelete.totalCredits }} créditos)</span>
+        </div>
+      </div>
+
+      <div class="delete-warning-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>Esta acción es irreversible y liberará los cupos de las 3 materias matriculadas en el sistema.</span>
+      </div>
+    </div>
+
+    <!-- Pie de Botones -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        <span *ngIf="isDeleting" class="btn-spinner"></span>
+        <span>{{ isDeleting ? 'Eliminando...' : 'Sí, Eliminar Registro' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL DE CARGA GLOBAL PARA BOTONES (COMPAÑEROS, EDITAR, REGISTRAR)
+     ========================================================================= -->
+<div *ngIf="actionLoading" class="modal-backdrop">
+  <div class="loading-modal-dialog">
+    <div class="loading-ring"></div>
+    <h4 class="loading-modal-title">{{ actionLoadingTitle }}</h4>
+    <p class="loading-modal-desc">{{ actionLoadingDesc }}</p>
+  </div>
+</div>
