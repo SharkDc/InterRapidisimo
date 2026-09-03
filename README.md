@@ -28,9 +28,9 @@ Aplicación web cliente-servidor para el registro de estudiantes en un programa 
 
 ```
 InterRapidisimo/
-├── Diseno_Tecnico_InterRapidisimo.pdf   # Documento Oficial de Diseño Técnico de Arquitectura (DTA en PDF)
 ├── docs/
-│   └── Diseno_Tecnico_Arquitectura.html # Fuente HTML/CSS y diagramas vectoriales SVG del DTA
+│   ├── Diseno_Tecnico_InterRapidisimo.pdf   # Documento Oficial de Diseño Técnico de Arquitectura (DTA en PDF)
+│   └── Diseno_Tecnico_Arquitectura.html     # Fuente HTML/CSS y diagramas vectoriales SVG del DTA
 ├── backend/
 │   ├── InterRapidisimo.sln
 │   ├── src/
