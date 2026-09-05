@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using InterRapidisimo.Application.Common.Models;
 using InterRapidisimo.Domain.Exceptions;
 
 namespace InterRapidisimo.Api.Middlewares;
@@ -8,6 +9,10 @@ public class GlobalExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
     {
@@ -27,13 +32,8 @@ public class GlobalExceptionHandlerMiddleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-            var response = new
-            {
-                success = false,
-                message = ex.Message
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            var response = ApiResponse.Failure(ex.Message);
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
         }
         catch (Exception ex)
         {
@@ -41,14 +41,8 @@ public class GlobalExceptionHandlerMiddleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new
-            {
-                success = false,
-                message = "Ha ocurrido un error interno en el servidor.",
-                detail = ex.Message
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            var response = ApiResponse.Failure("Ha ocurrido un error interno en el servidor.");
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
         }
     }
 }

@@ -96,11 +96,11 @@ export class StudentListComponent implements OnInit {
     this.cdr.markForCheck();
 
     this.studentService.deleteStudent(student.id).subscribe({
-      next: () => {
+      next: (res) => {
         this.isDeleting = false;
         this.deleteModalOpen = false;
         this.studentToDelete = null;
-        this.successMessage = `El registro de "${student.fullName}" fue eliminado exitosamente.`;
+        this.successMessage = res?.descripcion || `El registro de "${student.fullName}" fue eliminado exitosamente.`;
         this.loadStudents();
         this.cdr.markForCheck();
         setTimeout(() => {
@@ -112,7 +112,7 @@ export class StudentListComponent implements OnInit {
         this.isDeleting = false;
         this.deleteModalOpen = false;
         this.studentToDelete = null;
-        this.errorMessage = err.error?.message || 'Error al eliminar el estudiante.';
+        this.errorMessage = err.error?.descripcion || err.error?.message || 'Error al eliminar el estudiante.';
         this.cdr.markForCheck();
       }
     });

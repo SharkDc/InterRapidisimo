@@ -1,4 +1,5 @@
 using InterRapidisimo.Api.Middlewares;
+using InterRapidisimo.Api.Swagger;
 using InterRapidisimo.Application;
 using InterRapidisimo.Infrastructure;
 using InterRapidisimo.Infrastructure.Data;
@@ -23,6 +24,9 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API RESTful construida con .NET 10 y patrón CQRS para el registro de estudiantes, materias, profesores y cálculo de créditos."
     });
+
+    // Registrar cabeceras obligatorias (systemid, uuid, timestamp) en el contrato OpenAPI / Swagger
+    c.OperationFilter<RequiredHeadersOperationFilter>();
 });
 
 // 4. Política de CORS para la aplicación Angular
@@ -32,7 +36,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .WithExposedHeaders("X-System-Id", "X-Correlation-Id", "X-Timestamp");
     });
 });
 
@@ -56,6 +61,7 @@ using (var scope = app.Services.CreateScope())
 
 // 6. Pipeline HTTP
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+app.UseMiddleware<RequestHeadersMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

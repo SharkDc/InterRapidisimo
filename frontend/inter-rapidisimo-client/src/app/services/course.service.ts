@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Course } from '../models/course.model';
+import { ApiResponse } from '../models/api-response.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -12,6 +13,8 @@ export class CourseService {
   private apiUrl = `${environment.apiUrl}/courses`;
 
   getCourses(): Observable<Course[]> {
-    return this.http.get<Course[]>(this.apiUrl);
+    return this.http.get<ApiResponse<Course[]>>(this.apiUrl).pipe(
+      map(response => response.data)
+    );
   }
 }

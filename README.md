@@ -24,6 +24,52 @@ Aplicación web cliente-servidor para el registro de estudiantes en un programa 
 
 ---
 
+## 🛡️ Estándar de Comunicación API: Cabeceras y Envoltorio `ApiResponse<T>`
+
+Todas las operaciones REST del sistema implementan un contrato estandarizado tanto a nivel de cabeceras de trazabilidad de entrada como en la estructura de respuesta JSON de salida:
+
+### 1. Cabeceras HTTP de Trazabilidad (Obligatorias en Invocación)
+Tanto la API como el cliente Angular (mediante `requestHeadersInterceptor`) garantizan el envío y auditoría de:
+- **`systemid`**: Identificador del canal o sistema emisor de la petición (por defecto `inter-rapidisimo-web`).
+- **`uuid`**: Identificador único correlacional (GUID/UUIDv4) para trazabilidad distribuida extremo a extremo.
+- **`timestamp`**: Marca de tiempo en formato estándar ISO-8601 UTC (`yyyy-MM-ddTHH:mm:ss.fffZ`).
+
+El middleware del backend (`RequestHeadersMiddleware`) valida estrictamente la presencia y formato de estas cabeceras en todas las rutas `/api/*`, respondiendo con HTTP `400 Bad Request` si alguna falta o es inválida. Asimismo, mediante `RequiredHeadersOperationFilter`, Swagger/OpenAPI documenta estas cabeceras como parámetros obligatorios (`required: true`) en todos los endpoints, facilitando su consumo y prueba interactiva desde Swagger UI. En las respuestas, la API devuelve estas cabeceras con el prefijo `X-` (`X-System-Id`, `X-Correlation-Id`, `X-Timestamp`).
+
+### 2. Formato Estandarizado de Respuesta (`ApiResponse<T>`)
+Todas las respuestas HTTP (exitosas y de error) devuelven el siguiente envoltorio uniforme:
+- **`estado`** (`bool`): `true` cuando la operación se completó exitosamente; `false` ante fallos de validación de reglas de negocio o excepciones internas.
+- **`descripcion`** (`string`): Mensaje descriptivo con el resultado de la acción realizada o la explicación precisa del motivo del error.
+- **`data`** (`T?`): Carga útil solicitada (objeto, arreglo o identificador). En caso de error o ausencia de payload, retorna `null`.
+
+#### Ejemplo de Respuesta Exitosa (200 OK)
+```json
+{
+  "estado": true,
+  "descripcion": "Catálogo de materias y profesores obtenido exitosamente.",
+  "data": [
+    {
+      "id": 1,
+      "name": "Cálculo Diferencial",
+      "credits": 3,
+      "teacherId": 1,
+      "teacherName": "Dr. Carlos Mendoza"
+    }
+  ]
+}
+```
+
+#### Ejemplo de Respuesta de Error de Negocio (400 Bad Request)
+```json
+{
+  "estado": false,
+  "descripcion": "El estudiante no podrá tener clases con el mismo profesor. Se detectó conflicto con el docente 'Dr. Carlos Mendoza' en las materias: 'Cálculo Diferencial', 'Álgebra Lineal'.",
+  "data": null
+}
+```
+
+---
+
 ## 🏛️ Arquitectura del Sistema
 
 ```
@@ -93,7 +139,7 @@ npm start
 
 ### 3. Ejecutar las Pruebas Unitarias Automatizadas
 
-Para validar las reglas de negocio (máximo 3 materias, 9 créditos, profesores distintos obligatorios, compañeros de clase, etc.):
+Para validar las reglas de negocio (máximo 3 materias, 9 créditos, profesores distintos obligatorios, compañeros de clase, etc.) y la validación de cabeceras de trazabilidad:
 
 ```powershell
 cd backend
@@ -102,7 +148,7 @@ dotnet test
 
 Resultado esperado:
 ```
-Correctas! - Con error: 0, Superado: 18, Omitido: 0, Total: 18
+Correctas! - Con error: 0, Superado: 23, Omitido: 0, Total: 23
 ```
 
 ---

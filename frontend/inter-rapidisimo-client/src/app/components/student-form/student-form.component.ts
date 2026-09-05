@@ -327,7 +327,7 @@ export class StudentFormComponent implements OnInit {
         },
         error: (err) => {
           this.submitting = false;
-          this.errorMessage = err.error?.message || 'Ocurrió un error al actualizar el estudiante.';
+          this.errorMessage = err.error?.descripcion || err.error?.message || 'Ocurrió un error al actualizar el estudiante.';
           this.cdr.markForCheck();
         }
       });
@@ -348,7 +348,7 @@ export class StudentFormComponent implements OnInit {
         },
         error: (err) => {
           this.submitting = false;
-          this.errorMessage = err.error?.message || 'Ocurrió un error al registrar el estudiante.';
+          this.errorMessage = err.error?.descripcion || err.error?.message || 'Ocurrió un error al registrar el estudiante.';
           this.cdr.markForCheck();
         }
       });

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\InterRapidisimo.Application\InterRapidisimo.Application.csproj" />
     <ProjectReference Include="..\..\src\InterRapidisimo.Domain\InterRapidisimo.Domain.csproj" />
     <ProjectReference Include="..\..\src\InterRapidisimo.Infrastructure\InterRapidisimo.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\InterRapidisimo.Api\InterRapidisimo.Api.csproj" />
   </ItemGroup>
 
 </Project>
