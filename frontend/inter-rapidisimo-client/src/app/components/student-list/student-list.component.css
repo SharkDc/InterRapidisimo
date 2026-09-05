@@ -160,6 +160,13 @@
   text-align: right;
 }
 
+.credits-col,
+.credits-cell {
+  white-space: nowrap;
+  text-align: center;
+  width: 1%;
+}
+
 .actions-cell {
   white-space: nowrap;
 }
