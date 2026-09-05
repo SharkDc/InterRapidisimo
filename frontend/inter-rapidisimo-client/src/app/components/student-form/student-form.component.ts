@@ -178,21 +178,129 @@ export class StudentFormComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  // Validación de campos
+  isDocumentTouched: boolean = false;
+  isEmailTouched: boolean = false;
+  isPhoneTouched: boolean = false;
+
+  /**
+   * Bloquea físicamente en el evento keydown cualquier caracter que no sea dígito numérico (0-9).
+   */
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+      'Home', 'End'
+    ];
+
+    // Permitir teclas de control / atajos de edición (Ctrl+A, Ctrl+C, Ctrl+V, etc.)
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return true;
+    }
+
+    // Bloquear cualquier tecla que no sea dígito 0-9
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Filtra entradas en tiempo real actualizando tanto el modelo como el valor visual del DOM
+   * para impedir que se peguen o muestren caracteres no numéricos.
+   */
+  filterNumericInput(event: Event, field: 'documentNumber' | 'phone'): void {
+    const input = event.target as HTMLInputElement;
+    if (!input) return;
+
+    const cleanValue = input.value.replace(/\D/g, '');
+    if (input.value !== cleanValue) {
+      input.value = cleanValue;
+    }
+    this[field] = cleanValue;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Valida formato de correo electrónico
+   */
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+  }
+
+  /**
+   * Valida que el documento contenga entre 5 y 20 dígitos numéricos
+   */
+  isValidDocument(doc: string): boolean {
+    return /^\d{5,20}$/.test(doc.trim());
+  }
+
+  /**
+   * Valida el teléfono (si tiene contenido debe contener únicamente números y entre 7 y 15 dígitos)
+   */
+  isValidPhone(phone: string): boolean {
+    if (!phone || phone.trim() === '') {
+      return true;
+    }
+    return /^\d{7,15}$/.test(phone.trim());
+  }
+
+  get isPhoneValid(): boolean {
+    return this.isValidPhone(this.phone);
+  }
+
+  get isDocumentValid(): boolean {
+    return this.isEditMode || this.isValidDocument(this.documentNumber);
+  }
+
+  get isEmailValid(): boolean {
+    return this.isValidEmail(this.email);
+  }
+
+  get isFullNameValid(): boolean {
+    return this.fullName.trim().length >= 3;
+  }
+
   get totalCredits(): number {
     return this.selectedCourseIds.size * 3;
   }
 
   get canSubmit(): boolean {
     return (
-      this.fullName.trim().length >= 3 &&
-      this.email.trim().length > 0 &&
-      (this.isEditMode || this.documentNumber.trim().length > 0) &&
-      this.selectedCourseIds.size === 3
+      this.isFullNameValid &&
+      this.isEmailValid &&
+      this.isDocumentValid &&
+      this.isValidPhone(this.phone) &&
+      this.selectedCourseIds.size === 3 &&
+      !this.submitting
     );
   }
 
   onSubmit(): void {
     this.errorMessage = '';
+
+    if (!this.isFullNameValid) {
+      this.errorMessage = 'El nombre completo debe tener al menos 3 caracteres.';
+      return;
+    }
+
+    if (!this.isDocumentValid) {
+      this.errorMessage = 'El documento de identificación debe contener únicamente números (entre 5 y 20 dígitos).';
+      return;
+    }
+
+    if (!this.isEmailValid) {
+      this.errorMessage = 'El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).';
+      return;
+    }
+
+    if (!this.isValidPhone(this.phone)) {
+      this.errorMessage = 'El teléfono debe contener únicamente números (entre 7 y 15 dígitos).';
+      return;
+    }
 
     if (this.selectedCourseIds.size !== 3) {
       this.errorMessage = 'Debes seleccionar exactamente 3 materias para completar la matrícula (9 créditos).';

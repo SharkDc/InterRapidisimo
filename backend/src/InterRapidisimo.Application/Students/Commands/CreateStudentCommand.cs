@@ -22,7 +22,7 @@ public class CreateStudentCommandValidator : AbstractValidator<CreateStudentComm
     {
         RuleFor(x => x.DocumentNumber)
             .NotEmpty().WithMessage("El documento de identificación es obligatorio.")
-            .MaximumLength(20).WithMessage("El documento no debe exceder 20 caracteres.");
+            .Matches(@"^\d{5,20}$").WithMessage("El documento de identificación debe contener únicamente números (entre 5 y 20 dígitos).");
 
         RuleFor(x => x.FullName)
             .NotEmpty().WithMessage("El nombre completo es obligatorio.")
@@ -31,8 +31,14 @@ public class CreateStudentCommandValidator : AbstractValidator<CreateStudentComm
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("El correo electrónico es obligatorio.")
-            .EmailAddress().WithMessage("El formato del correo electrónico no es válido.")
-            .MaximumLength(150).WithMessage("El correo no debe exceder 150 caracteres.");
+            .MaximumLength(150).WithMessage("El correo no debe exceder 150 caracteres.")
+            .Matches(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+            .WithMessage("El formato del correo electrónico no es válido.");
+
+        RuleFor(x => x.Phone)
+            .Matches(@"^\d{7,15}$")
+            .When(x => !string.IsNullOrWhiteSpace(x.Phone))
+            .WithMessage("El teléfono debe contener únicamente números (entre 7 y 15 dígitos).");
 
         RuleFor(x => x.CourseIds)
             .NotNull().WithMessage("Debe seleccionar las materias a matricular.")

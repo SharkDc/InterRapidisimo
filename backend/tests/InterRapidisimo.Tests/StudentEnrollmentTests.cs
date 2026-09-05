@@ -271,4 +271,90 @@ public class StudentEnrollmentTests
         var curso5 = result.Courses.First(c => c.CourseId == 5);
         curso5.Classmates.Should().BeEmpty();
     }
+
+    [Theory]
+    [InlineData("ABC1234")]
+    [InlineData("1234")]       // Menos de 5 dígitos
+    [InlineData("123456789012345678901")] // Más de 20 dígitos
+    [InlineData("10.234.567")] // Caracteres especiales
+    public void Validator_Should_Fail_When_DocumentNumber_Format_Is_Invalid(string invalidDoc)
+    {
+        var validator = new CreateStudentCommandValidator();
+        var command = new CreateStudentCommand
+        {
+            DocumentNumber = invalidDoc,
+            FullName = "Estudiante Prueba",
+            Email = "prueba@test.com",
+            Phone = "3001234567",
+            CourseIds = new List<int> { 1, 3, 5 }
+        };
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateStudentCommand.DocumentNumber));
+    }
+
+    [Theory]
+    [InlineData("correo_sin_arroba.com")]
+    [InlineData("correo@")]
+    [InlineData("@dominio.com")]
+    [InlineData("correo@dominio")]
+    public void Validator_Should_Fail_When_Email_Format_Is_Invalid(string invalidEmail)
+    {
+        var validator = new CreateStudentCommandValidator();
+        var command = new CreateStudentCommand
+        {
+            DocumentNumber = "12345678",
+            FullName = "Estudiante Prueba",
+            Email = invalidEmail,
+            Phone = "3001234567",
+            CourseIds = new List<int> { 1, 3, 5 }
+        };
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateStudentCommand.Email));
+    }
+
+    [Theory]
+    [InlineData("300ABCD")]
+    [InlineData("12345")]      // Menos de 7 dígitos
+    [InlineData("1234567890123456")] // Más de 15 dígitos
+    public void Validator_Should_Fail_When_Phone_Format_Is_Invalid(string invalidPhone)
+    {
+        var validator = new CreateStudentCommandValidator();
+        var command = new CreateStudentCommand
+        {
+            DocumentNumber = "12345678",
+            FullName = "Estudiante Prueba",
+            Email = "prueba@test.com",
+            Phone = invalidPhone,
+            CourseIds = new List<int> { 1, 3, 5 }
+        };
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateStudentCommand.Phone));
+    }
+
+    [Fact]
+    public void Validator_Should_Pass_When_Data_Is_Valid()
+    {
+        var validator = new CreateStudentCommandValidator();
+        var command = new CreateStudentCommand
+        {
+            DocumentNumber = "1018456789",
+            FullName = "Estudiante Válido",
+            Email = "estudiante.valido@interrapidisimo.com",
+            Phone = "3101234567",
+            CourseIds = new List<int> { 1, 3, 5 }
+        };
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeTrue();
+    }
 }

@@ -41,14 +41,24 @@
           <input
             id="doc"
             type="text"
+            inputmode="numeric"
+            maxlength="20"
             class="form-control"
+            [class.is-invalid]="!isEditMode && (isDocumentTouched || documentNumber.length > 0) && !isDocumentValid"
             placeholder="Ej: 1018456789"
             [(ngModel)]="documentNumber"
+            (keydown)="onlyNumbers($event)"
+            (input)="filterNumericInput($event, 'documentNumber')"
+            (paste)="filterNumericInput($event, 'documentNumber')"
+            (blur)="isDocumentTouched = true"
             name="documentNumber"
             [disabled]="isEditMode"
             required
           />
           <small *ngIf="isEditMode" class="text-muted">El documento no puede modificarse en edición.</small>
+          <small *ngIf="!isEditMode && (isDocumentTouched || documentNumber.length > 0) && !isDocumentValid" class="text-danger">
+            Solo números permitidos (mínimo 5 y máximo 20 dígitos).
+          </small>
         </div>
 
         <div class="form-group">
@@ -71,11 +81,16 @@
             id="email"
             type="email"
             class="form-control"
+            [class.is-invalid]="isEmailTouched && !isEmailValid"
             placeholder="Ej: estudiante@correo.com"
             [(ngModel)]="email"
+            (blur)="isEmailTouched = true"
             name="email"
             required
           />
+          <small *ngIf="isEmailTouched && !isEmailValid" class="text-danger">
+            Ingresa un correo electrónico válido (ej: estudiante@correo.com).
+          </small>
         </div>
 
         <div class="form-group">
@@ -83,11 +98,21 @@
           <input
             id="phone"
             type="tel"
+            inputmode="numeric"
+            maxlength="15"
             class="form-control"
+            [class.is-invalid]="(isPhoneTouched || phone.length > 0) && !isValidPhone(phone)"
             placeholder="Ej: 3101234567"
             [(ngModel)]="phone"
+            (keydown)="onlyNumbers($event)"
+            (input)="filterNumericInput($event, 'phone')"
+            (paste)="filterNumericInput($event, 'phone')"
+            (blur)="isPhoneTouched = true"
             name="phone"
           />
+          <small *ngIf="(isPhoneTouched || phone.length > 0) && !isValidPhone(phone)" class="text-danger">
+            El teléfono debe contener únicamente números (entre 7 y 15 dígitos).
+          </small>
         </div>
       </div>
     </div>

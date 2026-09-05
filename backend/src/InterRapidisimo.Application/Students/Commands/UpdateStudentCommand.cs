@@ -30,8 +30,14 @@ public class UpdateStudentCommandValidator : AbstractValidator<UpdateStudentComm
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("El correo electrónico es obligatorio.")
-            .EmailAddress().WithMessage("El formato del correo electrónico no es válido.")
-            .MaximumLength(150).WithMessage("El correo no debe exceder 150 caracteres.");
+            .MaximumLength(150).WithMessage("El correo no debe exceder 150 caracteres.")
+            .Matches(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+            .WithMessage("El formato del correo electrónico no es válido.");
+
+        RuleFor(x => x.Phone)
+            .Matches(@"^\d{7,15}$")
+            .When(x => !string.IsNullOrWhiteSpace(x.Phone))
+            .WithMessage("El teléfono debe contener únicamente números (entre 7 y 15 dígitos).");
 
         RuleFor(x => x.CourseIds)
             .NotNull().WithMessage("Debe seleccionar las materias a matricular.")
