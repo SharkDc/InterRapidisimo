@@ -129,23 +129,31 @@
 .courses-tags {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .course-chip {
   background-color: var(--bg-hover);
-  border-left: 3px solid var(--primary);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-left: 3.5px solid var(--primary);
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.84rem;
   font-weight: 600;
   color: var(--text-main);
   display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.course-chip:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
 }
 
 .teacher-name {
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-muted);
+  margin-left: 0.25rem;
 }
 
 .text-right {
