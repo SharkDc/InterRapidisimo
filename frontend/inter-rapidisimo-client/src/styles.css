@@ -24,9 +24,10 @@
   --badge-success-text: #047857;
   --badge-success-border: #6EE7B7;
   --btn-secondary-bg: #FFFFFF;
-  --btn-secondary-hover-bg: #F1F5F9;
+  --btn-secondary-hover-bg: #FFF3E0;
   --btn-secondary-border: var(--border);
   --btn-secondary-text: var(--text-main);
+  --btn-secondary-hover-text: var(--primary);
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -62,6 +63,7 @@
   --btn-secondary-hover-bg: #2B3A4F;
   --btn-secondary-border: #384A63;
   --btn-secondary-text: #F8FAFC;
+  --btn-secondary-hover-text: #FF7043;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
@@ -140,10 +142,13 @@ body {
   color: var(--btn-secondary-text);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
   background-color: var(--btn-secondary-hover-bg);
   border-color: var(--primary);
-  color: #FFFFFF;
+  color: var(--btn-secondary-hover-text);
+  transform: translateY(-1px);
 }
 
 .btn-danger {
