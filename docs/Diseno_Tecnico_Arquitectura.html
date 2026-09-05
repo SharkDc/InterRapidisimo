@@ -964,6 +964,19 @@
       El código backend garantiza la satisfacción estricta de las reglas exigidas mediante validación a dos niveles:
     </p>
 
+    <div class="callout callout-warning avoid-break">
+      <div>
+        <strong>Validación Estricta de Integridad de Entradas (Pipeline FluentValidation):</strong><br>
+        En <code class="inline">CreateStudentCommandValidator</code> y <code class="inline">UpdateStudentCommandValidator</code>, se validan los formatos de datos antes de ingresar a la lógica de negocio:
+        <ul class="clean-list" style="margin-top: 6px;">
+          <li><code class="inline">DocumentNumber</code>: Requerido, únicamente números (dígitos 0-9), longitud entre 6 y 15 caracteres.</li>
+          <li><code class="inline">Email</code>: Requerido, formato estándar RFC 5322 válido.</li>
+          <li><code class="inline">Phone</code>: Opcional; en caso de suministrarse, restringido estrictamente a números entre 7 y 15 dígitos.</li>
+          <li><code class="inline">CourseIds</code>: Exactamente 3 materias sin elementos duplicados.</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="callout callout-primary avoid-break">
       <div>
         <strong>Regla 7: Restricción de Profesor Único por Estudiante</strong><br>
@@ -1024,7 +1037,7 @@ if (repeatedTeacher != null)
           <tr>
             <td><strong>NavbarComponent</strong></td>
             <td>Global (Layout)</td>
-            <td>Barra de navegación con isotipo institucional de Inter Rapidísimo, enlaces de acceso directo al listado de estudiantes y botón de nuevo registro.</td>
+            <td>Barra de navegación con logotipo oficial de Inter Rapidísimo, conmutador interactivo de Modo Claro / Modo Oscuro con persistencia en localStorage, accesos directos al listado y botón de nuevo registro.</td>
           </tr>
           <tr>
             <td><strong>StudentListComponent</strong></td>
@@ -1100,6 +1113,16 @@ isCourseDisabled(course: Course): boolean {
     <ul class="clean-list">
       <li><strong>Manejo de Errores Semánticos:</strong> Si el backend retorna una respuesta con código 400 (`BusinessRuleException`), el servicio mapea la propiedad <code class="inline">error.message</code> y la expone en un banner rojo en la parte superior del formulario.</li>
       <li><strong>Caché de Materias:</strong> Las 10 materias disponibles se consultan al inicializar el formulario, minimizando el tráfico de red innecesario.</li>
+    </ul>
+
+    <h2>4.4 Sistema de Temas (Modo Claro / Modo Oscuro) y Accesibilidad Visual</h2>
+    <p>
+      La aplicación incorpora un motor de temas dual (Light / Dark mode) gobernado por atributos semánticos (<code class="inline">data-theme="dark"</code>) y variables personalizadas de CSS (CSS Custom Properties):
+    </p>
+    <ul class="clean-list">
+      <li><strong>Persistencia de Preferencia:</strong> El estado del tema se almacena en <code class="inline">localStorage</code> y se sincroniza al arrancar la aplicación sin parpadeos visuales.</li>
+      <li><strong>Contraste Accesible (WCAG AAA):</strong> La paleta oscura cuenta con tokens calibrados para valores dinámicos críticos (como el indicador de créditos en verde menta/esmeralda neón <code class="inline">#4ADE80</code> con ratio superior a 11:1), estados hover distintivos con acento naranja corporativo y selección global de texto.</li>
+      <li><strong>Protección de Diseño Responsivo:</strong> Implementación de <code class="inline">white-space: nowrap;</code> en badges y columnas numéricas para evitar saltos de línea antiestéticos al redimensionar en dispositivos móviles o ventanas compactas.</li>
     </ul>
   </div>
 
@@ -1317,6 +1340,21 @@ ORDER BY c.Name, s_classmate.FullName;</pre>
         <tr>
           <td><code class="inline">Handler_Should_Fail_When_Document_Already_Exists</code></td>
           <td>Evita duplicidad en el número de documento de identificación del alumno.</td>
+          <td><span class="badge badge-success">PASÓ (100%)</span></td>
+        </tr>
+        <tr>
+          <td><code class="inline">Validator_Should_Fail_When_DocumentNumber_IsNotNumeric</code></td>
+          <td>Garantiza que el documento contenga exclusivamente caracteres numéricos (dígitos 0-9).</td>
+          <td><span class="badge badge-success">PASÓ (100%)</span></td>
+        </tr>
+        <tr>
+          <td><code class="inline">Validator_Should_Fail_When_Email_IsInvalidFormat</code></td>
+          <td>Rechaza correos electrónicos con estructuras incompatibles con la especificación RFC 5322.</td>
+          <td><span class="badge badge-success">PASÓ (100%)</span></td>
+        </tr>
+        <tr>
+          <td><code class="inline">Validator_Should_Fail_When_Phone_ContainsNonDigits</code></td>
+          <td>Valida que el teléfono de contacto contenga únicamente números entre 7 y 15 dígitos.</td>
           <td><span class="badge badge-success">PASÓ (100%)</span></td>
         </tr>
         <tr>
