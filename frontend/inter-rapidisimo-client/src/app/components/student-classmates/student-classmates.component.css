@@ -97,9 +97,10 @@
 }
 
 .classmate-item:hover {
-  background-color: var(--dark-surface);
+  background-color: var(--primary-light);
   border-color: var(--primary);
-  transform: translateX(3px);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.12);
 }
 
 .avatar-circle {
@@ -114,12 +115,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.classmate-item:hover .avatar-circle {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
 }
 
 .classmate-name {
   font-weight: 600;
   font-size: 0.92rem;
   color: var(--text-main);
+  transition: color 0.2s ease;
 }
 
 .empty-classmates {

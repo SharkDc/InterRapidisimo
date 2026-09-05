@@ -470,3 +470,52 @@ body {
     transform: scale(1) translateY(0);
   }
 }
+
+/* Global Selection */
+::selection {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+/* Classmate Items High Contrast */
+.classmate-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.classmate-item:hover,
+.classmate-item:focus,
+.classmate-item:active {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.15);
+}
+
+.classmate-item .classmate-name {
+  color: var(--text-main) !important;
+  font-weight: 600;
+}
+
+.classmate-item:hover .classmate-name,
+.classmate-item:focus .classmate-name,
+.classmate-item:active .classmate-name {
+  color: var(--text-main) !important;
+}
+
+.classmate-item .avatar-circle {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(255, 87, 34, 0.3);
+  transition: all 0.2s ease;
+}
+
+.classmate-item:hover .avatar-circle,
+.classmate-item:focus .avatar-circle,
+.classmate-item:active .avatar-circle {
+  background-color: var(--primary) !important;
+  color: #FFFFFF !important;
+  border-color: var(--primary) !important;
+}
+
