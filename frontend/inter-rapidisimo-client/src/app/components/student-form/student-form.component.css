@@ -142,7 +142,7 @@
   border: 2px solid var(--border);
   border-radius: 10px;
   padding: 1.15rem;
-  background-color: #FFFFFF;
+  background-color: var(--bg-card);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -159,15 +159,15 @@
 
 .course-card.selected {
   border-color: var(--primary);
-  background-color: #FFFBF9;
+  background-color: var(--primary-light);
   box-shadow: 0 0 0 1px var(--primary);
 }
 
 .course-card.disabled {
   opacity: 0.55;
-  background-color: #F8FAFC;
+  background-color: var(--bg-hover);
   cursor: not-allowed;
-  border-color: #E2E8F0;
+  border-color: var(--border);
 }
 
 .course-card-top {
@@ -187,8 +187,8 @@
 .course-credits-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  background-color: #F1F5F9;
-  color: #475569;
+  background-color: var(--bg-hover);
+  color: var(--text-muted);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
@@ -210,14 +210,15 @@
 }
 
 .course-teacher-info strong {
-  color: #334155;
+  color: var(--text-main);
 }
 
 .conflict-note {
   margin-top: 0.75rem;
   font-size: 0.75rem;
-  color: #DC2626;
-  background-color: #FEF2F2;
+  color: var(--danger);
+  background-color: var(--danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 0.4rem 0.6rem;
   border-radius: 4px;
   display: flex;
