@@ -353,6 +353,51 @@
       border: 1px solid #CBD5E1;
     }
 
+    .badge-danger {
+      background-color: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+
+    .badge-info {
+      background-color: #E0F2FE;
+      color: #075985;
+      border: 1px solid #BAE6FD;
+    }
+
+    .endpoint-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      page-break-inside: auto;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .endpoint-route {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 11pt;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .endpoint-title {
+      font-size: 9.5pt;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-left: auto;
+    }
+
     /* ==========================================================================
        TARJETAS Y CALLOUTS
        ========================================================================== */
@@ -1247,13 +1292,18 @@ ORDER BY c.Name, s_classmate.FullName;</pre>
       Los endpoints de la Web API implementan el estándar HTTP REST con códigos de estado semánticos (200 OK, 201 Created, 400 Bad Request, 404 Not Found y 500 Internal Server Error).
     </p>
 
-    <h2>6.1 Catálogo de Endpoints de la API</h2>
+    <h2>6.1 Catálogo y Especificación Detallada de Endpoints de la API</h2>
+    <p>
+      La Web API expone 7 endpoints construidos bajo principios REST y mediados mediante el patrón CQRS con MediatR. A continuación se presenta el catálogo general y, acto seguido, la ficha técnica pormenorizada para cada operación, detallando parámetros recibidos, tipos de datos, validaciones de dominio, respuestas HTTP y contratos JSON de consumo.
+    </p>
+
+    <!-- Tabla Resumen General -->
     <table>
       <thead>
         <tr>
           <th style="width: 10%;">Método</th>
-          <th style="width: 32%;">Ruta / Endpoint</th>
-          <th style="width: 38%;">Descripción y Caso de Uso CQRS</th>
+          <th style="width: 30%;">Ruta / Endpoint</th>
+          <th style="width: 40%;">Propósito y Caso de Uso CQRS</th>
           <th style="width: 20%;">Respuestas HTTP</th>
         </tr>
       </thead>
@@ -1261,47 +1311,821 @@ ORDER BY c.Name, s_classmate.FullName;</pre>
         <tr>
           <td><span class="method-badge method-get">GET</span></td>
           <td><code class="inline">/api/courses</code></td>
-          <td>Obtiene las 10 materias fijas y sus profesores asociados (<code class="inline">GetAvailableCoursesQuery</code>).</td>
-          <td>200 OK</td>
+          <td>Catálogo de 10 materias fijas y 5 docentes (<code class="inline">GetAvailableCoursesQuery</code>).</td>
+          <td><span class="badge badge-success">200 OK</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-get">GET</span></td>
           <td><code class="inline">/api/students</code></td>
-          <td>Consulta pública del listado general de estudiantes con créditos y materias (<code class="inline">GetAllStudentsQuery</code>).</td>
-          <td>200 OK</td>
+          <td>Consulta pública de todos los estudiantes y créditos (<code class="inline">GetAllStudentsQuery</code>).</td>
+          <td><span class="badge badge-success">200 OK</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-get">GET</span></td>
           <td><code class="inline">/api/students/{id}</code></td>
-          <td>Detalle completo de un estudiante específico para consulta o precarga de edición (<code class="inline">GetStudentByIdQuery</code>).</td>
-          <td>200 OK, 404 Not Found</td>
+          <td>Expediente y materias de un alumno por su ID (<code class="inline">GetStudentByIdQuery</code>).</td>
+          <td><span class="badge badge-success">200 OK</span> <span class="badge badge-warning">400 Bad Request</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-get">GET</span></td>
           <td><code class="inline">/api/students/{id}/classmates</code></td>
-          <td>Requerimiento 9: Lista de materias y únicamente nombres de compañeros (<code class="inline">GetStudentClassmatesQuery</code>).</td>
-          <td>200 OK, 404 Not Found</td>
+          <td>Requerimiento 9: Nombres confidenciales de compañeros (<code class="inline">GetStudentClassmatesQuery</code>).</td>
+          <td><span class="badge badge-success">200 OK</span> <span class="badge badge-warning">400 Bad Request</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-post">POST</span></td>
           <td><code class="inline">/api/students</code></td>
-          <td>Registra un nuevo estudiante con matrícula de 3 materias válidas (<code class="inline">CreateStudentCommand</code>).</td>
-          <td>201 Created, 400 Bad Request</td>
+          <td>Registro de estudiante y matrícula de 3 materias (<code class="inline">CreateStudentCommand</code>).</td>
+          <td><span class="badge badge-success">201 Created</span> <span class="badge badge-danger">400 Bad Request</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-put">PUT</span></td>
           <td><code class="inline">/api/students/{id}</code></td>
-          <td>Actualiza datos básicos y reconfigura las 3 materias matriculadas (<code class="inline">UpdateStudentCommand</code>).</td>
-          <td>200 OK, 400 Bad Request, 404</td>
+          <td>Actualización de datos y materias del estudiante (<code class="inline">UpdateStudentCommand</code>).</td>
+          <td><span class="badge badge-success">200 OK</span> <span class="badge badge-danger">400 Bad Request</span></td>
         </tr>
         <tr>
           <td><span class="method-badge method-delete">DELETE</span></td>
           <td><code class="inline">/api/students/{id}</code></td>
-          <td>Elimina el estudiante y su matrícula académica en cascada (<code class="inline">DeleteStudentCommand</code>).</td>
-          <td>200 OK, 404 Not Found</td>
+          <td>Eliminación de estudiante y matrícula en cascada (<code class="inline">DeleteStudentCommand</code>).</td>
+          <td><span class="badge badge-success">200 OK</span> <span class="badge badge-danger">400 Bad Request</span></td>
         </tr>
       </tbody>
     </table>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.1 GET /api/courses -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-route">/api/courses</span>
+        <span class="endpoint-title">Catálogo de Materias y Profesores</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">GetAvailableCoursesQuery</code> &rarr; <code class="inline">GetAvailableCoursesQueryHandler</code>.<br>
+        <strong>Descripción:</strong> Recupera la lista inmutable de las 10 materias disponibles en el programa institucional, cada una con un valor fijo de 3 créditos y asignada a uno de los 5 profesores docentes (2 materias por docente).
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 15%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 15%;">Requerido</th>
+            <th style="width: 35%;">Descripción y Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic;">
+              No requiere parámetros en la ruta (path), parámetros de consulta (query) ni cuerpo (body) en la solicitud HTTP.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Invocación HTTP</h4>
+      <pre>GET /api/courses HTTP/1.1
+Host: localhost:5000
+Accept: application/json</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Consulta ejecutada exitosamente.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Arreglo JSON de 10 objetos <code class="inline">CourseDto</code> con <code class="inline">id</code>, <code class="inline">name</code>, <code class="inline">credits</code>, <code class="inline">teacherId</code>, <code class="inline">teacherName</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Error imprevisto en la base de datos o middleware.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de error no controlado con propiedades <code class="inline">success</code>, <code class="inline">message</code> y <code class="inline">detail</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta (JSON Response - 200 OK)</h4>
+      <pre>[
+  {
+    "id": 1,
+    "name": "Matemáticas Básicas",
+    "credits": 3,
+    "teacherId": 1,
+    "teacherName": "Prof. Carlos Mendoza"
+  },
+  {
+    "id": 2,
+    "name": "Cálculo Diferencial",
+    "credits": 3,
+    "teacherId": 1,
+    "teacherName": "Prof. Carlos Mendoza"
+  },
+  {
+    "id": 3,
+    "name": "Física Mecánica",
+    "credits": 3,
+    "teacherId": 2,
+    "teacherName": "Prof. Diana Morales"
+  },
+  {
+    "id": 4,
+    "name": "Electromagnetismo",
+    "credits": 3,
+    "teacherId": 2,
+    "teacherName": "Prof. Diana Morales"
+  },
+  {
+    "id": 5,
+    "name": "Programación Orientada a Objetos",
+    "credits": 3,
+    "teacherId": 3,
+    "teacherName": "Prof. Fernando Ruiz"
+  }
+]</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.2 GET /api/students -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-route">/api/students</span>
+        <span class="endpoint-title">Listado General de Estudiantes (Requerimiento 8)</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">GetAllStudentsQuery</code> &rarr; <code class="inline">GetAllStudentsQueryHandler</code>.<br>
+        <strong>Descripción:</strong> Cumple el <strong>Requerimiento 8</strong> de la prueba técnica. Retorna la totalidad de estudiantes inscritos en el sistema, totalizando sus créditos académicos acumulados (9 créditos) y detallando las materias y docentes matriculados.
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 15%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 15%;">Requerido</th>
+            <th style="width: 35%;">Descripción y Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic;">
+              No requiere parámetros en la ruta, query strings ni payload en el cuerpo de la petición.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Invocación HTTP</h4>
+      <pre>GET /api/students HTTP/1.1
+Host: localhost:5000
+Accept: application/json</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Consulta completada con éxito.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Arreglo JSON de objetos <code class="inline">StudentDto</code> conteniendo datos demográficos, <code class="inline">totalCredits</code> y la lista anidada <code class="inline">courses</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Fallo crítico de infraestructura o persistencia.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto genérico de excepción con diagnóstico de error.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta (JSON Response - 200 OK)</h4>
+      <pre>[
+  {
+    "id": 1,
+    "documentNumber": "1018459201",
+    "fullName": "Alejandro Gómez",
+    "email": "alejandro.gomez@interrapidisimo.com",
+    "phone": "3104567890",
+    "registrationDate": "2026-09-01T08:00:00Z",
+    "totalCredits": 9,
+    "courses": [
+      {
+        "id": 1,
+        "name": "Matemáticas Básicas",
+        "credits": 3,
+        "teacherId": 1,
+        "teacherName": "Prof. Carlos Mendoza"
+      },
+      {
+        "id": 3,
+        "name": "Física Mecánica",
+        "credits": 3,
+        "teacherId": 2,
+        "teacherName": "Prof. Diana Morales"
+      },
+      {
+        "id": 5,
+        "name": "Programación Orientada a Objetos",
+        "credits": 3,
+        "teacherId": 3,
+        "teacherName": "Prof. Fernando Ruiz"
+      }
+    ]
+  }
+]</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.3 GET /api/students/{id} -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-route">/api/students/{id}</span>
+        <span class="endpoint-title">Consulta de Estudiante por Identificador</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">GetStudentByIdQuery</code> &rarr; <code class="inline">GetStudentByIdQueryHandler</code>.<br>
+        <strong>Descripción:</strong> Obtiene la ficha completa de un estudiante específico mediante su clave primaria numérica. Permite la visualización individual y la precarga de datos al abrir el modal de edición en el cliente web.
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 15%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 15%;">Requerido</th>
+            <th style="width: 35%;">Descripción y Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">id</code></td>
+            <td>Ruta (Path)</td>
+            <td><code class="inline">integer</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Identificador numérico primario único del estudiante en la base de datos (<code class="inline">id &gt; 0</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Invocación HTTP</h4>
+      <pre>GET /api/students/1 HTTP/1.1
+Host: localhost:5000
+Accept: application/json</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Estudiante localizado satisfactoriamente.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto individual <code class="inline">StudentDto</code> con toda la información del alumno, créditos y materias.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">400 Bad Request</span></td>
+            <td>El ID especificado no existe en la base de datos.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto con <code class="inline">success: false</code> y mensaje explicativo: <code class="inline">"No se encontró el estudiante con ID {id}."</code></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Fallo imprevisto en el servidor.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de error interno con descripción del incidente.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta Exitosa (JSON Response - 200 OK)</h4>
+      <pre>{
+  "id": 1,
+  "documentNumber": "1018459201",
+  "fullName": "Alejandro Gómez",
+  "email": "alejandro.gomez@interrapidisimo.com",
+  "phone": "3104567890",
+  "registrationDate": "2026-09-01T08:00:00Z",
+  "totalCredits": 9,
+  "courses": [
+    {
+      "id": 1,
+      "name": "Matemáticas Básicas",
+      "credits": 3,
+      "teacherId": 1,
+      "teacherName": "Prof. Carlos Mendoza"
+    },
+    {
+      "id": 3,
+      "name": "Física Mecánica",
+      "credits": 3,
+      "teacherId": 2,
+      "teacherName": "Prof. Diana Morales"
+    },
+    {
+      "id": 5,
+      "name": "Programación Orientada a Objetos",
+      "credits": 3,
+      "teacherId": 3,
+      "teacherName": "Prof. Fernando Ruiz"
+    }
+  ]
+}</pre>
+
+      <h4>Ejemplo de Respuesta Fallida (JSON Response - 400 Bad Request)</h4>
+      <pre>{
+  "success": false,
+  "message": "No se encontró el estudiante con ID 999."
+}</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.4 GET /api/students/{id}/classmates -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-route">/api/students/{id}/classmates</span>
+        <span class="endpoint-title">Compañeros de Aula por Materia (Requerimiento 9)</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">GetStudentClassmatesQuery</code> &rarr; <code class="inline">GetStudentClassmatesQueryHandler</code>.<br>
+        <strong>Descripción:</strong> Cumple con exactitud el <strong>Requerimiento 9</strong>: <em>«El estudiante podrá ver sólo el nombre de los alumnos con quienes compartirá cada clase»</em>. Por estricto diseño de seguridad y privacidad de datos, este endpoint oculta documentos de identidad, correos electrónicos y teléfonos de los compañeros, retornando exclusivamente sus nombres completos y excluyendo al propio estudiante consultante.
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 15%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 15%;">Requerido</th>
+            <th style="width: 35%;">Descripción y Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">id</code></td>
+            <td>Ruta (Path)</td>
+            <td><code class="inline">integer</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Identificador numérico del estudiante sobre el cual se consultan los compañeros de clase (<code class="inline">id &gt; 0</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Invocación HTTP</h4>
+      <pre>GET /api/students/1/classmates HTTP/1.1
+Host: localhost:5000
+Accept: application/json</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Consulta ejecutada exitosamente.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto <code class="inline">StudentClassmatesDto</code> con <code class="inline">studentId</code>, <code class="inline">studentName</code> y arreglo de materias con <code class="inline">classmates: string[]</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">400 Bad Request</span></td>
+            <td>Estudiante consultante inexistente en la base de datos.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto con <code class="inline">success: false</code> y mensaje explicativo.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Fallo no controlado en la ejecución del query relacional.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de error del servidor.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta Exitosa (JSON Response - 200 OK)</h4>
+      <pre>{
+  "studentId": 1,
+  "studentName": "Alejandro Gómez",
+  "courses": [
+    {
+      "courseId": 1,
+      "courseName": "Matemáticas Básicas",
+      "teacherName": "Prof. Carlos Mendoza",
+      "classmates": [
+        "Beatriz Pinzón",
+        "Camila Osorio"
+      ]
+    },
+    {
+      "courseId": 3,
+      "courseName": "Física Mecánica",
+      "teacherName": "Prof. Diana Morales",
+      "classmates": [
+        "Beatriz Pinzón",
+        "Daniel Samper"
+      ]
+    },
+    {
+      "courseId": 5,
+      "courseName": "Programación Orientada a Objetos",
+      "teacherName": "Prof. Fernando Ruiz",
+      "classmates": [
+        "Elena Vargas"
+      ]
+    }
+  ]
+}</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.5 POST /api/students -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-route">/api/students</span>
+        <span class="endpoint-title">Registro y Matrícula de Estudiante (Requerimientos 1, 5 y 7)</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">CreateStudentCommand</code> &rarr; <code class="inline">CreateStudentCommandHandler</code>.<br>
+        <strong>Validación Fluent:</strong> <code class="inline">CreateStudentCommandValidator</code>.<br>
+        <strong>Descripción:</strong> Orquesta atómicamente la creación del estudiante y su matrícula académica de 3 materias (9 créditos). Ejecuta las siguientes validaciones críticas de dominio:
+      </p>
+      <ul class="clean-list">
+        <li><strong>Documento Numérico y Único:</strong> Entre 5 y 20 dígitos numéricos sin letras ni caracteres especiales (<code class="inline">^\d{5,20}$</code>).</li>
+        <li><strong>Correo Válido y Único:</strong> Cumplimiento riguroso del estándar RFC 5322 sin colisión en BD.</li>
+        <li><strong>Exactamente 3 Materias:</strong> No permite registrar 1, 2, 4 o más materias; exige exactamente 3 IDs distintos.</li>
+        <li><strong>Incompatibilidad Docente (Regla 7):</strong> Verifica que las 3 materias seleccionadas correspondan a 3 profesores titulares distintos. Si dos materias pertenecen al mismo docente, la transacción se aborta con error 400.</li>
+      </ul>
+
+      <h4>Parámetros de Entrada (Request Payload - JSON)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 13%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 12%;">Requerido</th>
+            <th style="width: 40%;">Descripción y Reglas de Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">documentNumber</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Documento de identidad. Regex: <code class="inline">^\d{5,20}$</code> (5 a 20 dígitos numéricos). Verificación de unicidad en BD.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">fullName</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Nombres y apellidos completos. Longitud permitida: entre 3 y 150 caracteres.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">email</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Correo institucional/personal. Regex RFC 5322. Máximo 150 caracteres. Verificación de no duplicidad en BD.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">phone</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-secondary">Opcional</span></td>
+            <td>Teléfono de contacto. Si se provee, debe contener entre 7 y 15 dígitos numéricos (<code class="inline">^\d{7,15}$</code>).</td>
+          </tr>
+          <tr>
+            <td><code class="inline">courseIds</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">integer[]</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Arreglo con exactamente 3 identificadores de materias válidas, no repetidas y cuyos profesores sean 3 personas distintas.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Solicitud (Request Payload JSON)</h4>
+      <pre>{
+  "documentNumber": "1025896321",
+  "fullName": "Mariana Valencia",
+  "email": "mariana.valencia@interrapidisimo.com",
+  "phone": "3158974563",
+  "courseIds": [1, 3, 5]
+}</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">201 Created</span></td>
+            <td>Estudiante registrado y matriculado con éxito.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Cabecera <code class="inline">Location: /api/students/{id}</code> y cuerpo: <code class="inline">{ "id": int, "message": string }</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">400 Bad Request</span></td>
+            <td>Violación de reglas de validación (FluentValidation) o reglas de negocio (mismo profesor, duplicidad, etc.).</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto estandarizado <code class="inline">{ "success": false, "message": string }</code> detallando el motivo específico del rechazo.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Error fatal no controlado durante la transacción de persistencia.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de error de servidor con traza diagnóstica.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta Exitosa (JSON Response - 201 Created)</h4>
+      <pre>{
+  "id": 6,
+  "message": "Estudiante registrado exitosamente."
+}</pre>
+
+      <h4>Ejemplo de Respuesta Fallida por Mismo Docente (JSON Response - 400 Bad Request)</h4>
+      <pre>{
+  "success": false,
+  "message": "El estudiante no podrá tener clases con el mismo profesor. Se detectó conflicto con el docente 'Prof. Carlos Mendoza' en las materias: 'Matemáticas Básicas', 'Cálculo Diferencial'."
+}</pre>
+
+      <h4>Ejemplo de Respuesta Fallida por Documento Duplicado (JSON Response - 400 Bad Request)</h4>
+      <pre>{
+  "success": false,
+  "message": "Ya existe un estudiante registrado con el documento '1025896321'."
+}</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.6 PUT /api/students/{id} -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-put">PUT</span>
+        <span class="endpoint-route">/api/students/{id}</span>
+        <span class="endpoint-title">Actualización de Estudiante y Matrícula</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">UpdateStudentCommand</code> &rarr; <code class="inline">UpdateStudentCommandHandler</code>.<br>
+        <strong>Validación Fluent:</strong> <code class="inline">UpdateStudentCommandValidator</code>.<br>
+        <strong>Descripción:</strong> Modifica la información personal del estudiante y permite recomponer las 3 materias matriculadas, re-ejecutando la validación de profesores distintos y garantizando que el nuevo correo electrónico no pertenezca a otro estudiante. Requiere concordancia exacta entre el ID de la ruta URL y el ID suministrado en el cuerpo JSON.
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 13%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 12%;">Requerido</th>
+            <th style="width: 40%;">Descripción y Reglas de Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">id</code> (ruta)</td>
+            <td>Ruta (Path)</td>
+            <td><code class="inline">integer</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Identificador del estudiante en el segmento URL. Debe ser idéntico al campo <code class="inline">id</code> del cuerpo JSON.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">id</code> (body)</td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">integer</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Identificador numérico (<code class="inline">id &gt; 0</code>). Si difiere de la ruta, se rechaza con 400 Bad Request.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">fullName</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Nombres y apellidos completos (3 a 150 caracteres).</td>
+          </tr>
+          <tr>
+            <td><code class="inline">email</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Correo en formato RFC 5322 válido. Se valida unicidad excluyendo al estudiante actual.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">phone</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">string</code></td>
+            <td><span class="badge badge-secondary">Opcional</span></td>
+            <td>Teléfono móvil con formato numérico de 7 a 15 dígitos (<code class="inline">^\d{7,15}$</code>).</td>
+          </tr>
+          <tr>
+            <td><code class="inline">courseIds</code></td>
+            <td>Cuerpo (Body)</td>
+            <td><code class="inline">integer[]</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Arreglo con exactamente 3 IDs de materias válidas, no duplicadas y sin coincidencia de profesores.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Solicitud (Request Payload JSON)</h4>
+      <pre>{
+  "id": 6,
+  "fullName": "Mariana Valencia Zapata",
+  "email": "mariana.vz@interrapidisimo.com",
+  "phone": "3158974563",
+  "courseIds": [2, 4, 6]
+}</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Actualización exitosa de los datos y materias.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto <code class="inline">{ "success": true, "message": "Estudiante actualizado exitosamente." }</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">400 Bad Request</span></td>
+            <td>Discrepancia entre ID de ruta y de body, conflicto de docentes, correo ya en uso o estudiante no encontrado.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto <code class="inline">{ "success": false, "message": string }</code> con el motivo puntual del rechazo.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Fallo crítico inesperado en el servidor.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de diagnóstico de error interno.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta Exitosa (JSON Response - 200 OK)</h4>
+      <pre>{
+  "success": true,
+  "message": "Estudiante actualizado exitosamente."
+}</pre>
+
+      <h4>Ejemplo de Respuesta Fallida por Discrepancia de ID (JSON Response - 400 Bad Request)</h4>
+      <pre>{
+  "success": false,
+  "message": "El ID en la ruta no coincide con el ID del cuerpo de la petición."
+}</pre>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6.1.7 DELETE /api/students/{id} -->
+    <!-- ====================================================================== -->
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method-badge method-delete">DELETE</span>
+        <span class="endpoint-route">/api/students/{id}</span>
+        <span class="endpoint-title">Eliminación de Estudiante y Matrícula</span>
+      </div>
+      <p>
+        <strong>Manejador CQRS:</strong> <code class="inline">DeleteStudentCommand</code> &rarr; <code class="inline">DeleteStudentCommandHandler</code>.<br>
+        <strong>Descripción:</strong> Da de baja de manera definitiva el expediente del estudiante en el sistema. Gracias a la configuración de integridad referencial con eliminación en cascada (<code class="inline">ON DELETE CASCADE</code>) en la base de datos, se eliminan simultáneamente los registros correspondientes en las tablas <code class="inline">Enrollments</code> y <code class="inline">EnrollmentDetails</code>.
+      </p>
+
+      <h4>Parámetros de Entrada (Request)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Campo</th>
+            <th style="width: 15%;">Ubicación</th>
+            <th style="width: 15%;">Tipo de Dato</th>
+            <th style="width: 15%;">Requerido</th>
+            <th style="width: 35%;">Descripción y Validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">id</code></td>
+            <td>Ruta (Path)</td>
+            <td><code class="inline">integer</code></td>
+            <td><span class="badge badge-danger">Obligatorio</span></td>
+            <td>Identificador primario único del estudiante a eliminar (<code class="inline">id &gt; 0</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Invocación HTTP</h4>
+      <pre>DELETE /api/students/6 HTTP/1.1
+Host: localhost:5000
+Accept: application/json</pre>
+
+      <h4>Respuestas HTTP Posibles</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 18%;">Código HTTP</th>
+            <th style="width: 25%;">Estado / Escenario</th>
+            <th style="width: 17%;">Content-Type</th>
+            <th style="width: 40%;">Estructura y Descripción del Cuerpo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-success">200 OK</span></td>
+            <td>Estudiante y matrícula eliminados de forma exitosa.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de confirmación <code class="inline">{ "success": true, "message": "Estudiante eliminado exitosamente." }</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">400 Bad Request</span></td>
+            <td>El estudiante con el ID indicado no existe en el sistema.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto <code class="inline">{ "success": false, "message": "No se encontró el estudiante con ID {id}." }</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">500 Internal Server Error</span></td>
+            <td>Error no controlado durante la transacción de borrado.</td>
+            <td><code class="inline">application/json</code></td>
+            <td>Objeto de error del servidor.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Respuesta Exitosa (JSON Response - 200 OK)</h4>
+      <pre>{
+  "success": true,
+  "message": "Estudiante eliminado exitosamente."
+}</pre>
+
+      <h4>Ejemplo de Respuesta Fallida (JSON Response - 400 Bad Request)</h4>
+      <pre>{
+  "success": false,
+  "message": "No se encontró el estudiante con ID 999."
+}</pre>
+    </div>
+
+    <div class="page-break"></div>
 
     <h2>6.2 Suite de Pruebas Unitarias Automatizadas (xUnit)</h2>
     <p>
