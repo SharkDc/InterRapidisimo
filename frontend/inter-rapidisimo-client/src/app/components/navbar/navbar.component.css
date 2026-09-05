@@ -20,20 +20,27 @@
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1rem;
   text-decoration: none;
   color: inherit;
 }
 
-.brand-badge {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: #FFFFFF;
-  font-weight: 900;
-  font-size: 1.15rem;
-  letter-spacing: 1px;
-  padding: 0.4rem 0.65rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(255, 87, 34, 0.4);
+.brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.brand-link:hover .brand-logo {
+  transform: scale(1.03);
+}
+
+.brand-divider {
+  width: 1.5px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .brand-text {
@@ -43,8 +50,8 @@
 
 .brand-title {
   font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  letter-spacing: 0.8px;
   color: #FFFFFF;
 }
 
